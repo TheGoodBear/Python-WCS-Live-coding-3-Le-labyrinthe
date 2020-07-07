@@ -15,7 +15,6 @@ def Start():
     Game.DrawMaze()
 
     # main game loopg
-    
     while Variables.GameInProgress:
         Game.GetCharacterAction()
 

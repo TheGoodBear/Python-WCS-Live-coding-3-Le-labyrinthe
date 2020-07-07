@@ -1,6 +1,12 @@
+"""
+    Global variables
+"""
+
+# character
 CharacterSymbol = "\033[34m☻"
 CharacterPosition = {"X" : 0, "Y" : 0}
 
+# maze (MazeElements is a dictionary of dictionaries)
 MazeMap = []
 MazeElements = {
     " " : {
@@ -28,6 +34,6 @@ MazeElements = {
         }
     }
 
-
+# game
 GameInProgress = True
 GameMessage = ""

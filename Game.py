@@ -1,5 +1,9 @@
 # coding: utf-8
 
+"""
+    Game functions
+"""
+
 # import additional code
 import Variables
 import Utilities
@@ -41,6 +45,7 @@ def LoadMapFromFile(FileName):
                     Variables.CharacterPosition["X"] = X
                     Variables.CharacterPosition["Y"] = Y
                 X += 1
+            # add line to map
             Variables.MazeMap.append(Columns)
             Y += 1
         
@@ -67,6 +72,9 @@ def DrawMaze():
     # show message if any
     if Variables.GameMessage != "":
         print(Variables.GameMessage)
+        Variables.GameMessage = ""
+    else:
+        print()
 
 
 def GetCharacterAction():
@@ -74,10 +82,10 @@ def GetCharacterAction():
         Ask for character action
     """
 
+    # list of possible actions
     PossibleActions = ["H", "B", "G", "D", "Q"]
 
-    print("\n")
-
+    # wait for a valid action
     Action = ""
     while Action not in PossibleActions:
         Action = input("Que doit faire le personnage ? ").upper()
@@ -102,31 +110,36 @@ def ExecuteCharacterAction(Action):
     # prepare action
     if Action == "H":
         NewCharacterPositionY -= 1
+        Variables.GameMessage = "\nLe personnage se déplace vers le haut\n"
     elif Action == "B":
         NewCharacterPositionY += 1
+        Variables.GameMessage = "\nLe personnage se déplace vers le bas\n"
     elif Action == "G":
         NewCharacterPositionX -= 1
+        Variables.GameMessage = "\nLe personnage se déplace vers la gauche\n"
     elif Action == "D":
         NewCharacterPositionX += 1
+        Variables.GameMessage = "\nLe personnage se déplace vers la droite\n"
     elif Action == "Q":
-        Variables.GameMessage = "\nCouard, tu choisis la fuite !"
+        Variables.GameMessage = "\nCouard, tu choisis la fuite !\n"
         Variables.GameInProgress = False
         return
 
-    # check is action is allowed
+    # check if action is allowed
     if (NewCharacterPositionY < 0
         or NewCharacterPositionY >= len(Variables.MazeMap)
         or NewCharacterPositionX < 0 
         or NewCharacterPositionX >= len(Variables.MazeMap[0])):
         # new position is out of maze, can't move
-        Variables.GameMessage = "\nImpossible d'aller par là !"
+        Variables.GameMessage = "\nImpossible d'aller par là !\n"
         return
     elif not Variables.MazeElements[
         Variables.MazeMap[NewCharacterPositionY][NewCharacterPositionX]]["CanWalk"]:
-        # new position block movement, can't move
+        # new position blocks movement, can't move
         Variables.GameMessage = f"\nAïe, un {Variables.MazeElements[Variables.MazeMap[NewCharacterPositionY][NewCharacterPositionX]]['Name']} !\n"
         return
     elif Variables.MazeMap[NewCharacterPositionY][NewCharacterPositionX] == "X":
+        # player quits
         Variables.GameMessage = "\nBRAVO, tu es sorti du labyrinthe !"
         Variables.GameInProgress = False
         return
