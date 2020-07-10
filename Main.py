@@ -11,7 +11,8 @@ def Start():
 
     # initialize game
     Game.ShowTitleAndRules()
-    Game.LoadMapFromFile("Map 1")
+    MapNumber = Game.AskGameData()
+    Game.LoadMapFromFile("Maps\Map " + MapNumber)
     Game.DrawMaze()
 
     # main game loopg

@@ -24,32 +24,45 @@ def ShowTitleAndRules():
     print ("(H)aut, (B)as, (G)auche, (D)roite ou (Q)uitter\n")
 
 
+def AskGameData():
+    """
+        Ask map number
+    """
+    MapNumber = input("Quelle carte veux-tu (1 ou 2) ? ")
+    print()
+    return MapNumber
+
+
 def LoadMapFromFile(FileName):
     """
         Loads a labyrinth map from specified file name
     """
 
-    with open(FileName, "r", encoding="utf-8") as MyFile:
-        Y = 0
-        for Line in MyFile:
-            Columns = []
-            X = 0
-            for Character in Line:
-                # ignore line ends
-                if Character == "\n":
-                    continue
-                # add character to map
-                Columns.append(Character)
-                # place character at map entry
-                if Character == "E":
-                    Variables.CharacterPosition["X"] = X
-                    Variables.CharacterPosition["Y"] = Y
-                X += 1
-            # add line to map
-            Variables.MazeMap.append(Columns)
-            Y += 1
-        
-    # print(Variables.MazeMap)
+    try:
+        with open(FileName, "r", encoding="utf-8") as MyFile:
+            Y = 0
+            for Line in MyFile:
+                Columns = []
+                X = 0
+                for Character in Line:
+                    # ignore line ends
+                    if Character == "\n":
+                        continue
+                    # add character to map
+                    Columns.append(Character)
+                    # place character at map entry
+                    if Character == "E":
+                        Variables.CharacterPosition["X"] = X
+                        Variables.CharacterPosition["Y"] = Y
+                    X += 1
+                # add line to map
+                Variables.MazeMap.append(Columns)
+                Y += 1
+            
+        # print(Variables.MazeMap)
+    except FileNotFoundError:
+        Variables.GameInProgress = False
+        print("\nCette carte n'existe pas.\n")
 
 
 def DrawMaze():
