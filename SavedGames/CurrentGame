@@ -1,0 +1,19 @@
+Map:********************
+Map:E *                *
+Map:* * ** ** ****** ***
+Map:*    ***  *      * *
+Map:* *****  TT  TTT** *
+Map:*     *TTT  TTTT*  *
+Map:***** *  TT TTT** **
+Map:*      * *T  T*    *
+Map:* **** * *** *   * *
+Map:*  **  *  *    * * *
+Map:* * * ***** * *  * *
+Map:* * *  *  *  ** ****
+Map:* *  *  * ***   ** X
+Map:*    *  *          *
+Map:********************
+X:5
+Y:6
+TotalActions:11
+BadActions:1

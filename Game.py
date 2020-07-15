@@ -21,7 +21,8 @@ def ShowTitleAndRules():
 
     print (f"L'objectif est de faire sortir le personnage {Variables.CharacterSymbol} du labyrinthe")
     print ("On peut le déplacer en choisissant sa direction :")
-    print ("(H)aut, (B)as, (G)auche, (D)roite ou (Q)uitter\n")
+    print ("(H)aut, (B)as, (G)auche, (D)roite ou (Q)uitter")
+    print ("Il est également possible de (S)auvegarder la partie en cours ou de la re(C)harger\n")
 
 
 def AskGameData():
@@ -29,6 +30,8 @@ def AskGameData():
         Ask map number
     """
     MapNumber = input("Quelle carte veux-tu (1 ou 2) ? ")
+    if MapNumber == "" or not MapNumber.isdigit():
+        MapNumber = "1"
     print()
     return MapNumber
 
@@ -89,6 +92,9 @@ def DrawMaze():
     else:
         print()
 
+    # show game data
+    print(f"Nombre d'actions effectuées : {Variables.CharacterTotalActions} (dont {Variables.CharacterBadActions} mauvaises)\n")
+
 
 def GetCharacterAction():
     """
@@ -96,7 +102,7 @@ def GetCharacterAction():
     """
 
     # list of possible actions
-    PossibleActions = ["H", "B", "G", "D", "Q"]
+    PossibleActions = ["H", "B", "G", "D", "S", "C", "Q"]
 
     # wait for a valid action
     Action = ""
@@ -122,17 +128,78 @@ def ExecuteCharacterAction(Action):
 
     # prepare action
     if Action == "H":
+        Variables.CharacterTotalActions += 1
         NewCharacterPositionY -= 1
         Variables.GameMessage = "\nLe personnage se déplace vers le haut\n"
     elif Action == "B":
+        Variables.CharacterTotalActions += 1
         NewCharacterPositionY += 1
         Variables.GameMessage = "\nLe personnage se déplace vers le bas\n"
     elif Action == "G":
+        Variables.CharacterTotalActions += 1
         NewCharacterPositionX -= 1
         Variables.GameMessage = "\nLe personnage se déplace vers la gauche\n"
     elif Action == "D":
+        Variables.CharacterTotalActions += 1
         NewCharacterPositionX += 1
         Variables.GameMessage = "\nLe personnage se déplace vers la droite\n"
+    elif Action == "S":
+        try:
+            # open game file in write mode
+            with open(Variables.GameFileName, "w", encoding="utf-8") as MyFile:
+                # save maze
+                for LineIndex, Line in enumerate(Variables.MazeMap):
+                    MyFile.write("Map:")
+                    MyFile.writelines(Variables.MazeMap[LineIndex])
+                    MyFile.write("\n")
+                # save character position
+                MyFile.write(f"X:{Variables.CharacterPosition['X']}\n")
+                MyFile.write(f"Y:{Variables.CharacterPosition['Y']}\n")
+                # save game data
+                MyFile.write(f"TotalActions:{Variables.CharacterTotalActions}\n")
+                MyFile.write(f"BadActions:{Variables.CharacterBadActions}\n")
+                Variables.GameMessage = "\nLa partie en cours a été sauvegardée.\n"
+        except:
+            Variables.GameMessage = "\nSauvegarde de la partie impossible.\n"
+    elif Action == "C":
+        try:
+            # open game file in read mode
+            with open(Variables.GameFileName, "r", encoding="utf-8") as MyFile:
+                # reset map
+                Variables.MazeMap = []
+                # load maze
+                # read 1st line
+                Line = MyFile.readline()
+                # while line contains something
+                while Line:
+                    # remove last character (\n) at end of line
+                    Line = Line[:-1]
+                    if Line.startswith("Map:"):
+                        # this data is part of map
+                        MapLine = []
+                        for Character in Line[len("Map:"):]:
+                            MapLine.append(Character)
+                        Variables.MazeMap.append(MapLine)
+                    elif Line.startswith("X:"):
+                        # this data is player position
+                        NewCharacterPositionX = int(Line[len("X:"):])
+                    elif Line.startswith("Y:"):
+                        # this data is player position
+                        NewCharacterPositionY = int(Line[len("Y:"):])
+                    elif Line.startswith("TotalActions:"):
+                        # this data is game data
+                        Variables.CharacterTotalActions = int(Line[len("TotalActions:"):])
+                    elif Line.startswith("BadActions:"):
+                        # this data is game data
+                        Variables.CharacterBadActions = int(Line[len("BadActions:"):])
+                    
+                    # read next line
+                    Line = MyFile.readline()
+
+                Variables.GameMessage = "\nLa partie a été chargée.\n"
+        except:
+            Variables.GameMessage = "\Chargement de la partie impossible.\n"
+            input("Chargement terminé")
     elif Action == "Q":
         Variables.GameMessage = "\nCouard, tu choisis la fuite !\n"
         Variables.GameInProgress = False
@@ -145,11 +212,13 @@ def ExecuteCharacterAction(Action):
         or NewCharacterPositionX >= len(Variables.MazeMap[0])):
         # new position is out of maze, can't move
         Variables.GameMessage = "\nImpossible d'aller par là !\n"
+        Variables.CharacterBadActions += 1
         return
     elif not Variables.MazeElements[
         Variables.MazeMap[NewCharacterPositionY][NewCharacterPositionX]]["CanWalk"]:
         # new position blocks movement, can't move
         Variables.GameMessage = f"\nAïe, un {Variables.MazeElements[Variables.MazeMap[NewCharacterPositionY][NewCharacterPositionX]]['Name']} !\n"
+        Variables.CharacterBadActions += 1
         return
     elif Variables.MazeMap[NewCharacterPositionY][NewCharacterPositionX] == "X":
         # player quits
